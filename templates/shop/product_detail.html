@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %} 
+
+<div class="container">
+
+    <h1>{{product.title}}</h1>
+
+    <div id="product-details" class="container" style="display: flex;">
+
+        <div id="product-image">
+            <img src="{{product.picture.url}}" alt="" style="max-width: 15rem;">
+        </div>
+
+        <div id="product-info" class="container">
+            <p>{{product.description}}</p>
+            <p>{{product.price}}</p>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
