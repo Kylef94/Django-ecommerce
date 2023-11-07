@@ -4,7 +4,8 @@ from django.views import generic
 from django.http import JsonResponse
 import json
 from .models import *
-# Create your views here.
+from accounts.forms import *
+
 
 def index(request):
     return render(request, 'shop/index.html')
@@ -24,7 +25,7 @@ class Product_detail(generic.DetailView):
 
 def cart(request):
     if request.user.is_authenticated:
-        customer = request.user.customer
+        customer = request.user
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
         items = order.orderitem_set.all()
         
@@ -43,7 +44,7 @@ def updateItem(request):
     print('action:', action)
     print('productid:', productId)
     
-    customer = request.user.customer
+    customer = request.user
     product = Product.objects.get(id=productId)
     order, created = Order.objects.get_or_create(customer=customer, complete=False)
     
@@ -63,13 +64,17 @@ def updateItem(request):
 
 def checkout(request):
     if request.user.is_authenticated:
-        customer = request.user.customer
+        customer = request.user
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
         items = order.orderitem_set.all()
+        custform = CustomerChangeForm(instance=customer)
+        addrform = AddressForm()
         
     else:
         items = []
         order = {'get_total': 0, 'get_total_qty': 0}
+        custform = CustomerCreationForm()
+        addrform = AddressForm()
     
-    context = {'items': items, 'order': order}
+    context = {'items': items, 'order': order, 'custform': custform, 'addrform': addrform}
     return render(request, 'shop/checkout.html', context)
