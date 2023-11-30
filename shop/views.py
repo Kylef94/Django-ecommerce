@@ -4,12 +4,12 @@ from django.views import generic
 from django.http import JsonResponse
 import json
 from .models import *
-from accounts.forms import *
 
 
 def index(request):
     return render(request, 'shop/index.html')
 
+    
 class Products(generic.ListView):
     model = Product
     template_name = 'shop/products.html'
