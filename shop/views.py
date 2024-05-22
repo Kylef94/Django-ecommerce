@@ -4,6 +4,7 @@ from django.views import generic
 from django.http import JsonResponse
 import json
 from .models import *
+from .forms import *
 
 
 def index(request):
@@ -55,10 +56,10 @@ def updateItem(request):
     elif action == 'remove':
         orderitem.quantity = (orderitem.quantity - 1)
     
-    orderitem.save()
-    
     if orderitem.quantity <= 0:
         orderitem.delete()
+    else:
+        orderitem.save()
         
     return JsonResponse('Item was added', safe=False)
 
@@ -67,14 +68,15 @@ def checkout(request):
         customer = request.user
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
         items = order.orderitem_set.all()
-        custform = CustomerChangeForm(instance=customer)
-        addrform = AddressForm()
+        form = CheckoutForm()
         
     else:
         items = []
         order = {'get_total': 0, 'get_total_qty': 0}
-        custform = CustomerCreationForm()
-        addrform = AddressForm()
+        form = CheckoutForm()
     
-    context = {'items': items, 'order': order, 'custform': custform, 'addrform': addrform}
+    context = {'items': items, 'order': order, 'form': form}
     return render(request, 'shop/checkout.html', context)
+
+class Checkout(generic.View):
+    

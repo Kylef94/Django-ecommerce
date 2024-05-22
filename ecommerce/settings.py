@@ -31,11 +31,19 @@ INSTALLED_APPS = [
     
     #my apps
     'shop',
-    'accounts',
     
     #pip libraries
+    'crispy_forms',
+    'crispy_bootstrap5',
     'django_bootstrap5',
     'django_countries',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    # 'allauth.socialaccount.providers.paypal'
+    # 'allauth.socialaccount.providers.microsoft',
+    # 'allauth.socialaccount.providers.google',
+    # 'allauth.socialaccount.providers.facebook',
     ]
 
 
@@ -47,6 +55,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    # Add the account middleware:
+    "allauth.account.middleware.AccountMiddleware",
     
     
 ]
@@ -64,6 +75,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                
+                # `allauth` needs this from django
+                'django.template.context_processors.request',
             ],
         },
     },
@@ -135,6 +149,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 AUTHENTICATION_BACKENDS = (
     # Needed to login by username in Django admin, regardless of `allauth`
     "django.contrib.auth.backends.ModelBackend",
+    
+    # `allauth` specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
 SITE_ID = 1
@@ -142,3 +159,8 @@ SITE_ID = 1
 LOGIN_REDIRECT_URL = "shop:home"
 
 LOGOUT_REDIRECT_URL = "shop:home"
+
+#crispy forms
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = 'bootstrap5'

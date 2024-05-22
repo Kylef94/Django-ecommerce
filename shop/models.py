@@ -1,8 +1,25 @@
 from django.db import models
-from accounts.models import Customer
+from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django_countries.fields import CountryField
 
-  
+User = get_user_model()
+
+class Address(models.Model):
+    ADDRESS_CHOICES = (
+        ('B', 'Billing'),
+        ('S', 'Shipping'),
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    address_2 = models.CharField("address line 2",max_length=50)
+    address_1 = models.CharField("address line 1",max_length=50)
+    city = models.CharField("city",max_length=50)
+    postcode = models.CharField("postcode", max_length=10)
+    country = CountryField()
+    address_type = models.CharField(max_length=1, choices=ADDRESS_CHOICES)
+    default = models.BooleanField(default=False)
+    
 class Product(models.Model):
     name = models.CharField("product name",max_length=30)
     price = models.FloatField("product price" )
@@ -50,7 +67,7 @@ class Discount(models.Model):
         return f"Promo Name: {self.promo}\nProduct: {self.product.name}\nAmount: {self.amount}"
 
 class Order(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, blank=True, null=True)
+    customer = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     date = models.DateField("date created",auto_now_add=True)
     complete = models.BooleanField("completed",default=False, blank=False)
     txn_id = models.CharField("transaction id", max_length=200, null=True)
@@ -80,11 +97,26 @@ class OrderItem(models.Model):
     quantity = models.IntegerField("order quantity", default=1)
     added = models.DateTimeField("date added", auto_now_add=True)
     
+    billing_address = models.ForeignKey(
+        Address, related_name='billing_address', blank=True, null=True, on_delete=models.SET_NULL)
+    shipping_address = models.ForeignKey(
+        Address, related_name='shipping_address', blank=True, null=True, on_delete=models.SET_NULL)
+    
     class Meta:
         verbose_name = "order item"
         verbose_name_plural = "order items"
+
+    def __str__(self):
+        return self.reference_number
+
+    @property
+    def reference_number(self):
+        return f"ORDER-{self.pk}"
+    
         
     @property
     def get_item_total(self):
         total = self.product.price * self.quantity
         return total
+
+

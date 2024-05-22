@@ -1,4 +1,5 @@
-{% load static %}
+{% load static allauth account socialaccount i18n crispy_forms_tags %}
+
 
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
@@ -9,7 +10,8 @@
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>{% block title %}{% endblock %}</title>
+    <title>{% block head_title %} {% endblock head_title %}</title>
+    {% block extra_head %} {% endblock extra_head %}
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
@@ -75,12 +77,14 @@
           <div class="d-flex" role="login status">
             {% if user.is_authenticated %}
             <p>
-              Hi {{ user.username }}! <a href="{% url 'logout' %}">Log Out</a>
+              Hi {{ user.username }}!
+              <a href="{% url 'account_logout' %}">Log Out</a>
             </p>
             {% else %}
             <p>
-              You are not logged in, <a href="{% url 'login' %}">Log In</a> or
-              <a href="{% url 'accounts:sign_up' %}">Sign up</a>
+              You are not logged in,
+              <a href="{% url 'account_login' %}">Log In</a> or
+              <a href="{% url 'account_signup' %}">Sign up</a>
             </p>
 
             {% endif %}
@@ -89,7 +93,32 @@
       </div>
     </nav>
 
-    {% block content %} {% endblock %}
+
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        </div> 
+        {% endfor %}
+        {% endif %}
+
+    <div class="container">
+      <section class="mb-4">
+          <div class="row wow fadeIn">
+              <div class="col-6 offset-3">
+                      
+              {% block content %}
+              {% endblock content %}
+
+              {% block extra_body %}
+              {% endblock extra_body %}
+              </div>
+          </div>
+      </section>
+    </div>
   </body>
 
   <script
